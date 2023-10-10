@@ -21,7 +21,7 @@ class AppleStandard extends ActiveRecord
   const STATUS_HANGING = 1;
   const STATUS_FALLEN = 2;
   const STATUS_ROTTEN = 3;
-  const ROTTEN_TIME = 5*360;
+  const ROTTEN_TIME = 5*3600;
 
   private AppleState $stateHanging;
   private AppleState $stateFallen;
@@ -40,6 +40,10 @@ class AppleStandard extends ActiveRecord
     return 'apple';
   }
 
+  /**
+   * @param string $color
+   * @param $config
+   */
   public function __construct(string $color = '', $config = [])
   {
     $this->stateHanging = new AppleStateHanging($this);
@@ -54,6 +58,9 @@ class AppleStandard extends ActiveRecord
     parent::__construct($config);
   }
 
+  /**
+   * @return void
+   */
   public function afterFind()
   {
     parent::afterFind();
@@ -68,6 +75,9 @@ class AppleStandard extends ActiveRecord
 
   }
 
+  /**
+   * @return void
+   */
   public function switchToStateFallen(): void
   {
     $this->state = $this->stateFallen;
@@ -75,6 +85,9 @@ class AppleStandard extends ActiveRecord
     $this->save();
   }
 
+  /**
+   * @return void
+   */
   public function switchToStateRotten(): void
   {
     $this->state = $this->stateRotten;
@@ -82,11 +95,19 @@ class AppleStandard extends ActiveRecord
     $this->save();
   }
 
+  /**
+   * @param int $percent
+   * @return void
+   * @throws \Exception
+   */
   public function eat(int $percent): void
   {
     $this->state->eat($percent);
   }
 
+  /**
+   * @return void
+   */
   public function fall(): void
   {
     $this->state->fall();
@@ -129,9 +150,9 @@ class AppleStandard extends ActiveRecord
   public static function getStatusList(): array
   {
     return [
-      self::STATUS_HANGING => 'Висит',
-      self::STATUS_FALLEN => 'Упало',
-      self::STATUS_ROTTEN => 'Гнилое',
+      self::STATUS_HANGING => 'Hanging on a tree',
+      self::STATUS_FALLEN => 'Fallen to ground',
+      self::STATUS_ROTTEN => 'Rotten',
     ];
   }
 

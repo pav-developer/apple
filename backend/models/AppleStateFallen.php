@@ -15,10 +15,16 @@ final class AppleStateFallen extends AppleState
   {
     $newSize = $this->appleStandard->size - $percent/100;
 
+    if ($this->appleStandard->fallen_date + AppleStandard::ROTTEN_TIME < time()) {
+      $this->appleStandard->switchToStateRotten();
+      throw new \Exception('Apple is rotten now, you can\'t eat it');
+    }
+
     if ($newSize <= 0) {
       $this->delete();
       throw new \Exception('Apple fully eaten and deleted');
     }
+
     $this->appleStandard->size = $newSize;
     $this->appleStandard->save();
   }

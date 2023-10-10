@@ -48,6 +48,16 @@ return [
             'rules' => [
             ],
         ],
+        'formatter' => [
+          'class' => 'yii\i18n\Formatter',
+          'dateFormat' => 'php:d.m.Y',
+          'datetimeFormat' => 'php:d.m.Y H:i',
+          'timeFormat' => 'php:H:i:s',
+          'nullDisplay' => '-',
+          'decimalSeparator' => '.',
+          'locale' => 'ru-RU',
+          'thousandSeparator' => ' ',
+        ],
     ],
     'params' => $params,
 ];

@@ -1,5 +1,6 @@
 <?php
 
+use backend\assets\AppleAsset;
 use common\widgets\Alert;
 use yii\helpers\Html;
 use yii\widgets\ListView;
@@ -11,29 +12,9 @@ use yii\widgets\Pjax;
 
 $this->title = 'Apples';
 $this->params['breadcrumbs'][] = $this->title;
-?>
 
-    <style>
-        .apple-view {
-            background: #ccc;
-            -webkit-border-radius: 80px;
-            -moz-border-radius: 80px;
-            border-radius: 80px;
-            margin-bottom: 25px;
-        }
-        .apple-view.green {
-            background: #7fd38a;
-        }
-        .apple-view.yellow {
-            background: #f2efac;
-        }
-        .apple-view.red {
-            background: #f07e7e;
-        }
-        .apple-view.rotten {
-            opacity: 0.5;
-        }
-    </style>
+AppleAsset::register($this);
+?>
 
 <?php Pjax::begin(['id' => 'applePjax', 'enablePushState' => false, 'timeout' => false]); ?>
     <div class="apple-index">
@@ -43,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
           <?= Html::a('Generate', ['generate'], ['class' => 'btn btn-warning']) ?>
         </p>
 
-      <?= Alert::widget() ?>
+        <?= Alert::widget() ?>
 
         <div class="row">
           <?php

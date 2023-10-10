@@ -43,12 +43,7 @@ class AppleController extends Controller
     AppleStandard::deleteAll();
     AppleStandard::generate();
 
-    $searchModel = new AppleSearch();
-    $dataProvider = $searchModel->search($this->request->queryParams);
-    return $this->renderPartial('index', [
-      'searchModel' => $searchModel,
-      'dataProvider' => $dataProvider,
-    ]);
+    return $this->actionIndex();
   }
 
   /**
@@ -61,13 +56,7 @@ class AppleController extends Controller
     $oApple = $this->findModel($id);
     $oApple->fall();
 
-    $searchModel = new AppleSearch();
-    $dataProvider = $searchModel->search($this->request->queryParams);
-    return $this->renderPartial('index', [
-      'searchModel' => $searchModel,
-      'dataProvider' => $dataProvider,
-    ]);
-
+    return $this->actionIndex();
   }
 
   /**
@@ -87,13 +76,7 @@ class AppleController extends Controller
       \Yii::$app->session->setFlash('error', $e->getMessage());
     }
 
-    $searchModel = new AppleSearch();
-    $dataProvider = $searchModel->search($this->request->queryParams);
-    return $this->renderPartial('index', [
-      'searchModel' => $searchModel,
-      'dataProvider' => $dataProvider,
-    ]);
-
+    return $this->actionIndex();
   }
 
   /**
@@ -125,13 +108,7 @@ class AppleController extends Controller
   {
     $this->findModel($id)->delete();
 
-    $searchModel = new AppleSearch();
-    $dataProvider = $searchModel->search([]);
-
-    return $this->render('index', [
-      'searchModel' => $searchModel,
-      'dataProvider' => $dataProvider,
-    ]);
+    return $this->actionIndex();
   }
 
   /**

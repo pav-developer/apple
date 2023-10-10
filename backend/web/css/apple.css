@@ -1,0 +1,19 @@
+.apple-view {
+    background: #ccc;
+    -webkit-border-radius: 80px;
+    -moz-border-radius: 80px;
+    border-radius: 80px;
+    margin-bottom: 25px;
+}
+.apple-view.green {
+    background: #7fd38a;
+}
+.apple-view.yellow {
+    background: #f2efac;
+}
+.apple-view.red {
+    background: #f07e7e;
+}
+.apple-view.rotten {
+    opacity: 0.5;
+}
