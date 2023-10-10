@@ -2,8 +2,25 @@
 
 namespace backend\models;
 
-class AppleStandard
+use yii\base\Exception;
+use yii\db\ActiveRecord;
+
+/**
+ * This is the model class for table "apple".
+ *
+ * @property int $id
+ * @property string $color
+ * @property float|null $size
+ * @property int|null $created_date
+ * @property int|null $fallen_date
+ * @property int|null $status
+ * @property AppleState $state
+ */
+class AppleStandard extends ActiveRecord
 {
+  const STATUS_HANGING = 1;
+  const STATUS_FALLEN = 2;
+  const STATUS_ROTTEN = 3;
   const ROTTEN_TIME = 5*360;
 
   private AppleState $stateHanging;
@@ -15,32 +32,54 @@ class AppleStandard
    */
   private AppleState $state;
 
-  private int $stateId;
-  private float $size;
-  private string $color;
-  private int $createdDate;
-  private int $fallenDate;
+  /**
+   * {@inheritdoc}
+   */
+  public static function tableName()
+  {
+    return 'apple';
+  }
 
-  public function __construct(string $color)
+  public function __construct(string $color = '', $config = [])
   {
     $this->stateHanging = new AppleStateHanging($this);
-    $this->stateFallen= new AppleStateFallen($this);
+    $this->stateFallen = new AppleStateFallen($this);
     $this->stateRotten = new AppleStateRotten($this);
 
+    $this->status = self::STATUS_HANGING;
     $this->state = $this->stateHanging;
     $this->size = 1;
     $this->color = $color;
-    $this->createdDate = time() + rand(-self::ROTTEN_TIME, 0);
+
+    parent::__construct($config);
+  }
+
+  public function afterFind()
+  {
+    parent::afterFind();
+
+    if ($this->status === self::STATUS_FALLEN) {
+      $this->state = $this->stateFallen;
+    } elseif ($this->status == self::STATUS_ROTTEN) {
+      $this->state = $this->stateRotten;
+    } else {
+      $this->state = $this->stateHanging;
+    }
+
   }
 
   public function switchToStateFallen(): void
   {
     $this->state = $this->stateFallen;
+    $this->status = self::STATUS_FALLEN;
+    $this->save();
   }
 
   public function switchToStateRotten(): void
   {
     $this->state = $this->stateRotten;
+    $this->status = self::STATUS_ROTTEN;
+    $this->save();
   }
 
   public function eat(int $percent): void
@@ -53,49 +92,56 @@ class AppleStandard
     $this->state->fall();
   }
 
-  public function delete(): void
-  {
-    $this->state->delete();
+  /**
+   * @return bool
+   * @throws Exception
+   */
+  public static function generate(): bool {
+
+    $count = 10;
+    $aColors = self::getColorList();
+
+    for ($i = 0; $i < $count; $i++) {
+      $color = rand(0, count($aColors)-1);
+      $createdDate = time() + rand(-self::ROTTEN_TIME, 0);
+
+      $oApple = new AppleStandard($aColors[$color]);
+      $oApple->created_date = $createdDate;
+
+      if (!$oApple->save()) {
+        throw new Exception('Ошибка сохранения яблока');
+      }
+    }
+    return true;
   }
 
   /**
-   * @return float
+   * @return string[]
    */
-  public function getSize(): float
+  public static function getColorList(): array
   {
-    return $this->size;
+    return ['green', 'yellow', 'red'];
   }
 
   /**
-   * @param float $size
+   * @return string[]
    */
-  public function setSize(float $size): void
+  public static function getStatusList(): array
   {
-    $this->size = $size;
-  }
-
-  /**
-   * @return int
-   */
-  public function getFallenDate(): int
-  {
-    return $this->fallenDate;
-  }
-
-  /**
-   * @param int $fallenDate
-   */
-  public function setFallenDate(int $fallenDate): void
-  {
-    $this->fallenDate = $fallenDate;
+    return [
+      self::STATUS_HANGING => 'Висит',
+      self::STATUS_FALLEN => 'Упало',
+      self::STATUS_ROTTEN => 'Гнилое',
+    ];
   }
 
   /**
    * @return string
    */
-  public function getColor(): string
+  public function getStatus(): string
   {
-    return $this->color;
+    $ar = self::getStatusList();
+    return $ar[$this->status] ?? 'unknown status';
   }
 
 }

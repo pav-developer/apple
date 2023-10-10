@@ -2,34 +2,49 @@
 
 namespace backend\models;
 
+use yii\db\StaleObjectException;
+
 final class AppleStateFallen extends AppleState
 {
 
+  /**
+   * @throws \Throwable
+   * @throws StaleObjectException
+   */
   public function eat(int $percent): void
   {
-    $newSize = $this->appleStandard->getSize() - $percent/100;
+    $newSize = $this->appleStandard->size - $percent/100;
+
     if ($newSize <= 0) {
-      echo 'eat: ok<br/>';
-      $this->appleStandard->delete();
-      return;
+      $this->delete();
+      throw new \Exception('Apple fully eaten and deleted');
     }
-    $this->appleStandard->setSize($newSize);
-    echo 'eat: ok<br/>';
+    $this->appleStandard->size = $newSize;
+    $this->appleStandard->save();
   }
 
+  /**
+   * @throws \Exception
+   */
   public function fall(): void
   {
-    echo 'fall: not, already fallen<br/>';
+    throw new \Exception('fall: not, already fallen');
   }
 
+  /**
+   * @throws \Exception
+   */
   public function rotten(): void
   {
-    echo 'rotten: can be rotten only after 5 hours<br/>';
-    //if ($this->appleStandard->)
+    throw new \Exception('rotten: can be rotten only after 5 hours');
   }
 
+  /**
+   * @throws StaleObjectException
+   * @throws \Throwable
+   */
   public function delete(): void
   {
-    echo 'delete<br/>';
+    $this->appleStandard->delete();
   }
 }

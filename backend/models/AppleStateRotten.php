@@ -5,23 +5,32 @@ namespace backend\models;
 final class AppleStateRotten extends AppleState
 {
 
+  /**
+   * @throws \Exception
+   */
   public function eat(int $percent): void
   {
-    echo 'eat: can not eat, it is rotten!<br/>';
+    throw new \Exception('eat: can not eat, it is rotten!');
   }
 
+  /**
+   * @throws \Exception
+   */
   public function fall(): void
   {
-    echo 'fall: already fallen<br/>';
+    throw new \Exception('fall: already fallen');
   }
 
+  /**
+   * @throws \Exception
+   */
   public function rotten(): void
   {
-    echo 'rotten: already rotten<br/>';
+    throw new \Exception('rotten: already rotten');
   }
 
   public function delete(): void
   {
-    echo 'delete<br/>';
+    $this->appleStandard->delete();
   }
 }

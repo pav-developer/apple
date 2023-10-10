@@ -4,17 +4,17 @@ namespace backend\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\Apple;
+//use backend\models\Apple;
 
 /**
- * AppleSearch represents the model behind the search form of `backend\models\Apple`.
+ * AppleSearch represents the model behind the search form of `backend\models\AppleStandard`.
  */
-class AppleSearch extends Apple
+class AppleSearch extends AppleStandard
 {
-  /*public function __construct($config = [])
+  public function __construct($config = [])
   {
     parent::__construct('', $config);
-  }*/
+  }
 
   /**
      * {@inheritdoc}
@@ -46,7 +46,7 @@ class AppleSearch extends Apple
      */
     public function search($params)
     {
-        $query = Apple::find();
+        $query = AppleStandard::find();
 
         // add conditions that should always apply here
 
@@ -63,15 +63,15 @@ class AppleSearch extends Apple
         }
 
         // grid filtering conditions
-        $query->andFilterWhere([
+        /*$query->andFilterWhere([
             'id' => $this->id,
             'size' => $this->size,
             'created_date' => $this->created_date,
             'fallen_date' => $this->fallen_date,
             'status' => $this->status,
-        ]);
+        ]);*/
 
-        $query->andFilterWhere(['like', 'color', $this->color]);
+        //$query->andFilterWhere(['like', 'color', $this->color]);
 
         return $dataProvider;
     }

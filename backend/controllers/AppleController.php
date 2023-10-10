@@ -2,15 +2,13 @@
 
 namespace backend\controllers;
 
-use backend\models\Apple;
 use backend\models\AppleSearch;
+use backend\models\AppleStandard;
 use yii\base\Exception;
+use yii\db\StaleObjectException;
+use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\web\ForbiddenHttpException;
-use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use yii\web\Response;
 
 /**
  * AppleController implements the CRUD actions for Apple model.
@@ -22,19 +20,19 @@ class AppleController extends Controller
    */
   public function behaviors()
   {
-    return array_merge(
-      parent::behaviors(),
-      [
-        'verbs' => [
-          'class' => VerbFilter::class,
-          'actions' => [
-            //'delete' => ['POST'],
+    return [
+      'access' => [
+        'class' => AccessControl::class,
+        'rules' => [
+          [
+            'actions' => ['index', 'generate', 'fall', 'eat', 'delete'],
+            'allow' => true,
+            'roles' => ['@'],
           ],
         ],
-      ]
-    );
+      ],
+    ];
   }
-
 
   /**
    * @return string
@@ -42,8 +40,8 @@ class AppleController extends Controller
    */
   public function actionGenerate()
   {
-    Apple::deleteAll();
-    Apple::generate();
+    AppleStandard::deleteAll();
+    AppleStandard::generate();
 
     $searchModel = new AppleSearch();
     $dataProvider = $searchModel->search($this->request->queryParams);
@@ -51,6 +49,25 @@ class AppleController extends Controller
       'searchModel' => $searchModel,
       'dataProvider' => $dataProvider,
     ]);
+  }
+
+  /**
+   * @param int $id
+   * @return string
+   * @throws NotFoundHttpException
+   */
+  public function actionFall(int $id)
+  {
+    $oApple = $this->findModel($id);
+    $oApple->fall();
+
+    $searchModel = new AppleSearch();
+    $dataProvider = $searchModel->search($this->request->queryParams);
+    return $this->renderPartial('index', [
+      'searchModel' => $searchModel,
+      'dataProvider' => $dataProvider,
+    ]);
+
   }
 
   /**
@@ -62,51 +79,12 @@ class AppleController extends Controller
    */
   public function actionEat(int $id, int $percent)
   {
-    if (\Yii::$app->request->isAjax) {
-      \Yii::$app->response->format = Response::FORMAT_JSON;
-    }
-
-    if ($percent < 0 || $percent > 100) {
-      throw new \Exception('Указано неверное значение для процента');
-    }
-
     $oApple = $this->findModel($id);
 
     try {
       $oApple->eat($percent);
     } catch (\Exception $e) {
       \Yii::$app->session->setFlash('error', $e->getMessage());
-    }
-
-    if (!$oApple->save()) {
-      throw new \Exception('Ошибка сохранения яблока');
-    }
-
-    $searchModel = new AppleSearch();
-    $dataProvider = $searchModel->search($this->request->queryParams);
-    return $this->renderPartial('index', [
-      'searchModel' => $searchModel,
-      'dataProvider' => $dataProvider,
-    ]);
-
-  }
-
-  /**
-   * @param int $id
-   * @return string
-   * @throws NotFoundHttpException
-   */
-  public function actionFall(int $id)
-  {
-    if (\Yii::$app->request->isAjax) {
-      \Yii::$app->response->format = Response::FORMAT_JSON;
-    }
-
-    $oApple = $this->findModel($id);
-
-    $oApple->fallToGround();
-    if (!$oApple->save()) {
-      throw new \Exception('Ошибка сохранения яблока');
     }
 
     $searchModel = new AppleSearch();
@@ -138,26 +116,34 @@ class AppleController extends Controller
    * Deletes an existing Apple model.
    * If deletion is successful, the browser will be redirected to the 'index' page.
    * @param int $id ID
-   * @return \yii\web\Response
+   * @return string
    * @throws NotFoundHttpException if the model cannot be found
+   * @throws \Throwable
+   * @throws StaleObjectException
    */
   public function actionDelete($id)
   {
     $this->findModel($id)->delete();
 
-    return $this->redirect(['index']);
+    $searchModel = new AppleSearch();
+    $dataProvider = $searchModel->search([]);
+
+    return $this->render('index', [
+      'searchModel' => $searchModel,
+      'dataProvider' => $dataProvider,
+    ]);
   }
 
   /**
    * Finds the Apple model based on its primary key value.
    * If the model is not found, a 404 HTTP exception will be thrown.
    * @param int $id ID
-   * @return Apple the loaded model
+   * @return AppleStandard the loaded model
    * @throws NotFoundHttpException if the model cannot be found
    */
   protected function findModel($id)
   {
-    if (($model = Apple::findOne(['id' => $id])) !== null) {
+    if (($model = AppleStandard::findOne(['id' => $id])) !== null) {
       return $model;
     }
 
