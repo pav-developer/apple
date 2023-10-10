@@ -22,10 +22,9 @@ class m231008_162126_create_apple extends Migration
         'id' => $this->primaryKey(),
         'color' => $this->string(),
         'size' => $this->decimal(3,2)->defaultValue(1),
-        'created_date' => $this->integer()->notNull(),
+        'created_date' => $this->integer(),
         'fallen_date' => $this->integer(),
         'status' => $this->smallInteger(),
-        'rotten' => $this->boolean()->defaultValue(0),
       ], $tableOptions);
     }
 
